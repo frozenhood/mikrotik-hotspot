@@ -27,7 +27,6 @@
 :global telegramUserID "Chat ID"                           # Admin chat ID (get via @userinfobot)
 :global userPass "Pass for MAC users"                      # Password for MAC users
 :global telegramOffset 0                                   # Offset for Telegram API (leave 0)
-:log info "Hotspot: Global variables initialized"
 ```
 
 ---
@@ -35,7 +34,7 @@
 ## Схема работы
 
 1. **Клиент подключается к Hotspot**  
-   Авторизация через фиксированный логин/пароль (например, trial/trial).
+   Авторизация через фиксированный логин/пароль (например, trial/trial вшитый в форму).
 
 2. **`welcoming.rsc`**  
    При входе клиента отправляет запрос в Telegram-бот с кнопками для выбора времени доступа.
@@ -50,7 +49,7 @@
    Теперь он может войти с новым логином (MAC-адрес) и общим паролем.
 
 6. **`logoff.rsc`**  
-   При завершении сессии пользователя выполняет очистку: удаляет пользователя, IP binding, отключает от Wi-Fi.
+   При завершении сессии пользователя и исчерпании лимита скрипт выполняет очистку: удаляет пользователя, IP binding, отключает от Wi-Fi.
 
 ---
 
@@ -128,6 +127,12 @@ add chain=forward action=drop comment="Block all internet for deny_internet prof
 **Создайте скрипт `logoff` с содержимым:**
 
 из файла logoff.rsc
+
+### 6. Копирование кастомизированных html файлов
+
+**Скопируйте на роутер файл `login.html` с формой входа:**
+
+**Скопируйте на роутер файл `alogin.html` с формой тестирования наличия интернет:**
 
 ---
 
