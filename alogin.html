@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Authorization completed</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 2em; }
+        .status { font-size: 1.5em; margin-top: 2em; }
+    </style>
+</head>
+<body>
+    <h1>Please, wait...</h1>
+    <h2>We are waiting for admin's approval</h2>
+    <div class="status" id="status">Checking internet connection</div>
+
+    <script>
+        function checkInternet() {
+            fetch("https://clients3.google.com/generate_204", { method: 'GET', mode: 'no-cors' })
+                .then(() => {
+                    document.getElementById("status").textContent = "✅ Internet is available!";
+
+                    setTimeout(() => {
+                        if (window.opener) {
+                            window.close();
+                        } else {
+
+                            window.location.href = "https://google.com";
+                            window.close();
+                        }
+                    }, 2000);
+                })
+                .catch(() => {
+                    setTimeout(checkInternet, 3000);
+                });
+        }
+
+        checkInternet();
+    </script>
+</body>
+</html>

@@ -38,10 +38,6 @@
 :local updates ($jsonData->"result")
 :local lastUpdateId $telegramOffset
 
-
-
-
-
 :if ([:len $updates] > 0) do={
     :log info ("Hotspot: Received Telegram update.")
 

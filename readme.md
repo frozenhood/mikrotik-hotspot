@@ -56,7 +56,20 @@
 
 ## Установка
 
-### 1. Настройка сети и Hotspot
+### 1. Инициализация переменных при старте
+
+**Создайте скрипт `onstart` с содержимым:**
+
+из файла onstart.rsc
+
+**Добавьте задачу в планировщик для автозапуска скрипта при старте системы:**
+
+```rsc
+/system scheduler
+add name="init-hotspot-vars" on-event="/system script run onstart" start-time=startup run-at-startup=yes
+```
+
+### 2. Настройка сети и Hotspot
 
 ```rsc
 /interface vlan add name=vlan50-hotspot vlan-id=50 interface=bridge1
@@ -69,51 +82,52 @@
     gateway-address=192.168.50.1 dns-server=1.1.1.1
 ```
 
-### 2. Настройка профилей и пользователей
+### 3. Настройка профилей и пользователей
 
 ```rsc
 /ip hotspot profile
 add name=hsprof hotspot-address=192.168.50.1 \
     dns-name=hotspot.local html-directory=hotspot \
-    login-by=mac,http-chap,http-pap use-radius=no mac-auth-password=macpass123
+    login-by=mac,http-chap,http-pap use-radius=no mac-auth-password=$userPass
 
 /ip hotspot user
 add name=trial password=trial profile=welcoming
 
 /ip hotspot user profile
-add name=1h session-timeout=1h on-logout=logoff
-add name=3h session-timeout=3h on-logout=logoff
-add name=1d session-timeout=1d on-logout=logoff
-add name=1w session-timeout=1w on-logout=logoff
-add name=perm
+add name=1h session-timeout=1h on-logout=logoff shared-users=1
+add name=3h session-timeout=3h on-logout=logoff shared-users=1
+add name=1d session-timeout=1d on-logout=logoff shared-users=1
+add name=1w session-timeout=1w on-logout=logoff shared-users=1
+add name=perm shared-users=1
 add name=deny session-timeout=1m
-add name=welcoming on-login=welcoming session-timeout=1m
-```
+add name=welcoming on-login=welcoming session-timeout=10m address-list=deny_internet_list shared-users=10
 
-### 3. Инициализация переменных при старте
-
-**Создайте скрипт `onstart.rsc` с содержимым:**
-
-```rsc
-:global telegramBotToken "Your valid telegram bot token"
-:global telegramUserID "Chat ID"
-:global userPass "Pass for MAC users"
-:global telegramOffset 0
-:log info "Hotspot: Global variables initialized"
-```
-
-**Добавьте задачу в планировщик для автозапуска скрипта при старте системы:**
-
-```rsc
-/system scheduler
-add name="init-hotspot-vars" on-event="/system script run onstart" start-time=startup run-at-startup=yes
+/ip firewall filter
+add chain=forward action=drop comment="Block all internet for deny_internet profile" \
+    src-address-list=deny_internet_list
 ```
 
 ### 4. Запуск основного скрипта-обработчика
 
+**Создайте скрипт `reader` с содержимым:**
+
+из файла reader.rsc
+
+**Добавьте задачу в планировщик для запуска скрипта по интервалу:**
+
 ```rsc
 /system scheduler add name="run-reader" interval=15s on-event="/system script run reader" start-time=startup
 ```
+
+### 5. Добавление остальных скриптов-обработчиков
+
+**Создайте скрипт `welcoming` с содержимым:**
+
+из файла welcoming.rsc
+
+**Создайте скрипт `logoff` с содержимым:**
+
+из файла logoff.rsc
 
 ---
 
@@ -146,42 +160,4 @@ add name="init-hotspot-vars" on-event="/system script run onstart" start-time=st
 
 ## Контакты
 
-Для вопросов и предложений: [ваш контакт или Telegram]
-
-```rsc
-/interface vlan add name=vlan50-hotspot vlan-id=50 interface=bridge1
-
-/ip address add address=192.168.50.1/24 interface=vlan50-hotspot
-
-/ip pool add name=hs-pool ranges=192.168.50.10-192.168.50.100
-
-/ip dhcp-server add name=hs-dhcp interface=vlan50-hotspot address-pool=hs-pool disabled=no
-
-/ip dhcp-server network add address=192.168.50.0/24 gateway=192.168.50.1 dns-server=1.1.1.1
-
-/ip dns set servers=1.1.1.1 allow-remote-requests=yes
-
-/ip hotspot setup interface=vlan50-hotspot address-pool=hs-pool dns-name=hotspot.local \
-    gateway-address=192.168.50.1 dns-server=1.1.1.1
-```
-
-```rsc
-/ip hotspot profile
-add name=hsprof hotspot-address=192.168.50.1 \
-    dns-name=hotspot.local html-directory=hotspot \
-    login-by=mac,http-chap,http-pap use-radius=no mac-auth-password=$userPass
-
-/ip hotspot user
-add name=trial password=trial profile=welcoming
-
-/ip hotspot user profile
-add name=1h session-timeout=1h on-logout=logoff
-add name=3h session-timeout=3h on-logout=logoff
-add name=1d session-timeout=1d on-logout=logoff
-add name=1w session-timeout=1w on-logout=logoff
-add name=perm
-add name=deny session-timeout=1m
-add name=welcoming on-login=welcoming session-timeout=1m
-
-/system scheduler add name="run-reader" interval=15s on-event="/system script run reader" start-time=startup
-```
+Для вопросов и предложений: Telegram: @r0abz
