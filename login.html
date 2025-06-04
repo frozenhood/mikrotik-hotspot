@@ -32,6 +32,8 @@
         function doLogin() {
             document.sendin.username.value = document.login.username.value;
             document.sendin.password.value = hexMD5('$(chap-id)' + document.login.password.value + '$(chap-challenge)');
+
+            document.sendin.action = "$(link-login-only)?mac=" + encodeURIComponent(document.login.mac.value);
             document.sendin.submit();
             return false;
         }
@@ -65,7 +67,7 @@
                         <img class="ico" src="img/password.svg" alt="#" />
                         <input name="password" type="hidden" value="trial" placeholder="Password" />
                     </label>
-
+                    <input type="hidden" name="mac" value="$(mac)">
                     <input type="submit" value="Request access" />
 
                 </form>

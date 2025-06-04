@@ -80,7 +80,11 @@
             :set hotspotProfile "perm"
         }
         :if ($action = "deny") do={
-            :set hotspotProfile "denied"
+            /ip hotspot ip-binding
+            :if ([:len [find where mac-address=$clientMac]] = 0) do={
+                add mac-address=$clientMac type=blocked
+                :log info ("Hotspot: IP binding blocked for " . $clientMac)
+            }
         }
 
         :if ([:len $hotspotProfile] > 0 && [:len $clientMac] > 0) do={

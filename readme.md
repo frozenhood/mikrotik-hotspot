@@ -68,6 +68,8 @@
 add name="init-hotspot-vars" on-event="/system script run onstart" start-time=startup run-at-startup=yes
 ```
 
+**Запустите скрипт вручную**
+
 ### 2. Настройка сети и Hotspot
 
 ```rsc
@@ -130,9 +132,9 @@ add chain=forward action=drop comment="Block all internet for deny_internet prof
 
 ### 6. Копирование кастомизированных html файлов
 
-**Скопируйте на роутер файл `login.html` с формой входа:**
+**Замените на роутере в папке `hotspot` файл `login.html` с формой входа:**
 
-**Скопируйте на роутер файл `alogin.html` с формой тестирования наличия интернет:**
+**Замените на роутере в папке `hotspot` файл `alogin.html` с формой тестирования наличия интернет:**
 
 ---
 
